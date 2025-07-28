@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+option go_package = "github.com/AyanokojiKiyotaka8/E-Commerce/types";
+
+import "google/api/annotations.proto";
+
+message GetProductReq { int64 id = 1; }
+
+message GetProductResp {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  double price = 4;
+}
+
+message PostProductReq {
+  string name = 1;
+  string description = 2;
+  double price = 3;
+}
+
+message PostProductResp {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  double price = 4;
+}
+
+service Product {
+  rpc GetProduct(GetProductReq) returns (GetProductResp) {
+    option (google.api.http) = {
+      get : "/v1/product/{id}"
+    };
+  }
+
+  rpc PostProduct(PostProductReq) returns (PostProductResp) {
+    option (google.api.http) = {
+      post : "/v1/product"
+      body : "*"
+    };
+  }
+}
