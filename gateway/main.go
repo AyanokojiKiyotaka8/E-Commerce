@@ -15,7 +15,7 @@ func main() {
 	mux := runtime.NewServeMux()
 	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
 
-	if err := types.RegisterProductHandlerFromEndpoint(context.Background(), mux, ":50051", opts); err != nil {
+	if err := types.RegisterProductServiceHandlerFromEndpoint(context.Background(), mux, ":50051", opts); err != nil {
 		log.Fatal(err)
 	}
 

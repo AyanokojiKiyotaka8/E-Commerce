@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+option go_package = "github.com/AyanokojiKiyotaka8/E-Commerce/types";
+
+import "google/api/annotations.proto";
+
+message ProductDetails {
+  string name = 1;
+  string description = 2;
+  double price = 3;
+}
+
+message Product {
+  string id = 1;
+  ProductDetails details = 2;
+}
+
+message GetProductReq { string id = 1; }
+
+message GetProductResp { Product product = 1; }
+
+message GetProductsReq {}
+
+message GetProductsResp { repeated Product products = 1; }
+
+message PostProductReq { ProductDetails product = 1; }
+
+message PostProductResp { Product product = 1; }
+
+message PutProductReq {
+  string id = 1;
+  ProductDetails product = 2;
+}
+
+message PutProductResp { Product product = 1; }
+
+message DeleteProductReq { string id = 1; }
+
+message DeleteProductResp {}
+
+service ProductService {
+  rpc GetProduct(GetProductReq) returns (GetProductResp) {
+    option (google.api.http) = {
+      get : "/v1/product/{id}"
+    };
+  }
+
+  rpc GetProducts(GetProductsReq) returns (GetProductsResp) {
+    option (google.api.http) = {
+      get : "/v1/product"
+    };
+  }
+
+  rpc PostProduct(PostProductReq) returns (PostProductResp) {
+    option (google.api.http) = {
+      post : "/v1/product"
+      body : "product"
+    };
+  }
+
+  rpc PutProduct(PutProductReq) returns (PutProductResp) {
+    option (google.api.http) = {
+      put : "/v1/product/{id}"
+      body : "product"
+    };
+  }
+
+  rpc DeleteProduct(DeleteProductReq) returns (DeleteProductResp) {
+    option (google.api.http) = {
+      delete : "/v1/product/{id}"
+    };
+  }
+}
