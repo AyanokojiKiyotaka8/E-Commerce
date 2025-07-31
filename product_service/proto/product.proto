@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "github.com/AyanokojiKiyotaka8/E-Commerce/types";
+option go_package = "github.com/AyanokojiKiyotaka8/E-Commerce/product_service/proto";
 
 import "google/api/annotations.proto";
 
@@ -23,16 +23,16 @@ message GetProductsReq {}
 
 message GetProductsResp { repeated Product products = 1; }
 
-message PostProductReq { ProductDetails product = 1; }
+message CreateProductReq { ProductDetails details = 1; }
 
-message PostProductResp { Product product = 1; }
+message CreateProductResp { Product product = 1; }
 
-message PutProductReq {
+message UpdateProductReq {
   string id = 1;
-  ProductDetails product = 2;
+  ProductDetails details = 2;
 }
 
-message PutProductResp { Product product = 1; }
+message UpdateProductResp { Product product = 1; }
 
 message DeleteProductReq { string id = 1; }
 
@@ -51,17 +51,17 @@ service ProductService {
     };
   }
 
-  rpc PostProduct(PostProductReq) returns (PostProductResp) {
+  rpc CreateProduct(CreateProductReq) returns (CreateProductResp) {
     option (google.api.http) = {
       post : "/v1/product"
-      body : "product"
+      body : "details"
     };
   }
 
-  rpc PutProduct(PutProductReq) returns (PutProductResp) {
+  rpc UpdateProduct(UpdateProductReq) returns (UpdateProductResp) {
     option (google.api.http) = {
       put : "/v1/product/{id}"
-      body : "product"
+      body : "details"
     };
   }
 

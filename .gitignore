@@ -12,3 +12,6 @@ bin
 
 # ENV file
 .env
+
+# Googleapis
+googleapis

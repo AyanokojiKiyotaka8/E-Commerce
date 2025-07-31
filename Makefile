@@ -22,14 +22,14 @@ pproto: check-plugins
 		--go_out=. --go_opt=paths=source_relative \
 		--go-grpc_out=. --go-grpc_opt=paths=source_relative \
 		--grpc-gateway_out=. --grpc-gateway_opt=paths=source_relative \
-		types/product.proto
+		product_service/proto/product.proto
 
 gateway: 
 	@go build -o bin/gateway ./gateway
 	@./bin/gateway
 
 product:
-	@go build -o bin/product ./product
-	@./bin/product
+	@go build -o bin/product_service ./product_service/cmd
+	@./bin/product_service
 
 .PHONY: check-plugins pproto gateway product
