@@ -6,6 +6,7 @@ import (
 	"net"
 
 	"github.com/AyanokojiKiyotaka8/E-Commerce/product_service/internal/handler"
+	"github.com/AyanokojiKiyotaka8/E-Commerce/product_service/internal/middleware"
 	"github.com/AyanokojiKiyotaka8/E-Commerce/product_service/internal/service"
 	"github.com/AyanokojiKiyotaka8/E-Commerce/product_service/internal/store"
 	"github.com/AyanokojiKiyotaka8/E-Commerce/product_service/proto"
@@ -21,7 +22,9 @@ func main() {
 	}
 
 	productStore := store.NewMongoProductStore(client)
-	productService := service.NewProductService(productStore)
+	var productService service.ProductServicer
+	productService = service.NewProductService(productStore)
+	productService = middleware.NewLogMiddleware(productService)
 	productHandler := handler.NewProductHandler(productService)
 
 	lis, err := net.Listen("tcp", ":50051")
