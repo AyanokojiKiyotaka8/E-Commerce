@@ -8,6 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type ProductStorer interface {
@@ -49,8 +50,13 @@ func (s *MongoProductStore) GetProducts(ctx context.Context, filter map[string]i
 		return nil, err
 	}
 
+	opts, err := getPaginationOptions(filter)
+	if err != nil {
+		return nil, err
+	}
+
 	var products []*model.Product
-	curr, err := s.coll.Find(ctx, dbFilter)
+	curr, err := s.coll.Find(ctx, dbFilter, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -94,8 +100,11 @@ func (s *MongoProductStore) DeleteProduct(ctx context.Context, filter map[string
 
 func parseMongoFilter(filter map[string]interface{}) (bson.M, error) {
 	dbFilter := bson.M{}
+	price := bson.M{}
+
 	for key, val := range filter {
-		if key == "id" {
+		switch key {
+		case "id":
 			sid, ok := val.(string)
 			if !ok {
 				return nil, fmt.Errorf("invalid id type")
@@ -105,9 +114,57 @@ func parseMongoFilter(filter map[string]interface{}) (bson.M, error) {
 				return nil, fmt.Errorf("invalid ObjectID")
 			}
 			dbFilter["_id"] = oid
-		} else {
+
+		case "minPrice":
+			minPrice, ok := val.(float64)
+			if !ok {
+				return nil, fmt.Errorf("invalid minPrice")
+			}
+			if minPrice > 0 {
+				price["$gte"] = minPrice
+			}
+
+		case "maxPrice":
+			maxPrice, ok := val.(float64)
+			if !ok {
+				return nil, fmt.Errorf("invalid maxPrice")
+			}
+			if maxPrice > 0 {
+				price["$lte"] = maxPrice
+			}
+
+		case "page", "limit":
+			// Skip pagination keys
+
+		default:
 			dbFilter[key] = val
 		}
 	}
+
+	if len(price) > 0 {
+		dbFilter["price"] = price
+	}
+
 	return dbFilter, nil
+}
+
+func getPaginationOptions(filter map[string]interface{}) (*options.FindOptions, error) {
+	opts := &options.FindOptions{}
+
+	limit, ok := filter["limit"].(int64)
+	if !ok {
+		return nil, fmt.Errorf("invalid limit")
+	}
+	if limit > 0 {
+		opts.SetLimit(limit)
+	}
+
+	page, ok := filter["page"].(int64)
+	if !ok {
+		return nil, fmt.Errorf("invalid page")
+	}
+	if page > 0 {
+		opts.SetSkip((page - 1) * limit)
+	}
+	return opts, nil
 }

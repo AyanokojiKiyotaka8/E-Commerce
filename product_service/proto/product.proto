@@ -19,9 +19,19 @@ message GetProductReq { string id = 1; }
 
 message GetProductResp { Product product = 1; }
 
-message GetProductsReq {}
+message GetProductsReq {
+  double min_price = 1;
+  double max_price = 2;
+  int64 page = 3;
+  int64 limit = 4;
+}
 
-message GetProductsResp { repeated Product products = 1; }
+message GetProductsResp {
+  repeated Product products = 1;
+  int64 count = 2;
+  int64 page = 3;
+  int64 limit = 4;
+}
 
 message CreateProductReq { ProductDetails details = 1; }
 

@@ -40,7 +40,22 @@ func (h *ProductHandler) GetProduct(ctx context.Context, req *proto.GetProductRe
 }
 
 func (h *ProductHandler) GetProducts(ctx context.Context, req *proto.GetProductsReq) (*proto.GetProductsResp, error) {
-	filter := map[string]interface{}{}
+	page := req.GetPage()
+	if page == 0 {
+		page = 1
+	}
+
+	limit := req.GetLimit()
+	if limit == 0 {
+		limit = 10
+	}
+
+	filter := map[string]interface{}{
+		"minPrice": req.GetMinPrice(),
+		"maxPrice": req.GetMaxPrice(),
+		"page":     page,
+		"limit":    limit,
+	}
 
 	products, err := h.svc.GetProducts(ctx, filter)
 	if err != nil {
@@ -54,6 +69,9 @@ func (h *ProductHandler) GetProducts(ctx context.Context, req *proto.GetProducts
 		resp.Products = append(resp.Products, convertModelToProto(p))
 	}
 
+	resp.Count = int64(len(products))
+	resp.Page = page
+	resp.Limit = limit
 	return resp, nil
 }
 
