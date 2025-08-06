@@ -6,6 +6,7 @@ import (
 	"net"
 
 	"github.com/AyanokojiKiyotaka8/E-Commerce/product_service/internal/handler"
+	"github.com/AyanokojiKiyotaka8/E-Commerce/product_service/internal/kafka"
 	"github.com/AyanokojiKiyotaka8/E-Commerce/product_service/internal/middleware"
 	"github.com/AyanokojiKiyotaka8/E-Commerce/product_service/internal/service"
 	"github.com/AyanokojiKiyotaka8/E-Commerce/product_service/internal/store"
@@ -22,8 +23,14 @@ func main() {
 	}
 
 	productStore := store.NewMongoProductStore(client)
+	kafkaProducer, err := kafka.NewKafkaProducer()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer kafkaProducer.Stop()
+
 	var productService service.ProductServicer
-	productService = service.NewProductService(productStore)
+	productService = service.NewProductService(productStore, kafkaProducer)
 	productService = middleware.NewLogMiddleware(productService)
 	productHandler := handler.NewProductHandler(productService)
 
