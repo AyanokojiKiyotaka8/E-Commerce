@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+option go_package = "github.com/AyanokojiKiyotaka8/E-Commerce/inventory_service/proto";
+
+import "google/api/annotations.proto";
+
+message Inventory {
+  string id = 1;
+  string stock_key = 5;
+  int64 count = 6;
+}
+
+message GetInventoryReq { string id = 1; }
+
+message GetInventoryResp { Inventory inventory = 1; }
+
+message GetInventoriesReq {
+  int64 page = 1;
+  int64 limit = 2;
+}
+
+message GetInventoriesResp {
+  repeated Inventory inventories = 1;
+  int64 count = 2;
+  int64 page = 3;
+  int64 limit = 4;
+}
+
+service InventoryService {
+  rpc GetInventory(GetInventoryReq) returns (GetInventoryResp) {
+    option (google.api.http) = {
+      get : "/v1/inventory/{id}"
+    };
+  }
+
+  rpc GetInventories(GetInventoriesReq) returns (GetInventoriesResp) {
+    option (google.api.http) = {
+      get : "/v1/inventory"
+    };
+  }
+}

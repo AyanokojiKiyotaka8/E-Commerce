@@ -24,12 +24,28 @@ pproto: check-plugins
 		--grpc-gateway_out=. --grpc-gateway_opt=paths=source_relative \
 		product_service/proto/product.proto
 
-gateway: 
-	@go build -o bin/gateway ./gateway
-	@./bin/gateway
-
 product:
 	@go build -o bin/product_service ./product_service/cmd
 	@./bin/product_service
 
-.PHONY: check-plugins pproto gateway product
+iproto: check-plugins
+	@protoc \
+		-I . \
+		-I ./googleapis \
+		--plugin=protoc-gen-go=$(PROTOC_GEN_GO) \
+		--plugin=protoc-gen-go-grpc=$(PROTOC_GEN_GRPC) \
+		--plugin=protoc-gen-grpc-gateway=$(PROTOC_GEN_GATEWAY) \
+		--go_out=. --go_opt=paths=source_relative \
+		--go-grpc_out=. --go-grpc_opt=paths=source_relative \
+		--grpc-gateway_out=. --grpc-gateway_opt=paths=source_relative \
+		inventory_service/proto/inventory.proto
+
+inventory:
+	@go build -o bin/inventory_service ./inventory_service/cmd
+	@./bin/inventory_service
+
+gateway: 
+	@go build -o bin/gateway ./gateway
+	@./bin/gateway
+
+.PHONY: check-plugins pproto product iproto inventory gateway
