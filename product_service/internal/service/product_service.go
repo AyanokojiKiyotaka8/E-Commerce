@@ -47,7 +47,7 @@ func (s *ProductService) CreateProduct(ctx context.Context, product *model.Produ
 		return nil, err
 	}
 
-	if err := s.producer.Produce("product-created", product); err != nil {
+	if err := s.producer.Produce("product-created", product.StockKey); err != nil {
 		return nil, err
 	}
 	return createdProduct, nil
@@ -76,12 +76,12 @@ func (s *ProductService) UpdateProduct(ctx context.Context, filter map[string]in
 	}
 
 	if newStockKey != product.StockKey {
-		if err := s.producer.Produce("product-updated-old", product); err != nil {
+		if err := s.producer.Produce("product-updated-old", product.StockKey); err != nil {
 			return err
 		}
 
 		product.StockKey = newStockKey
-		if err := s.producer.Produce("product-updated-new", product); err != nil {
+		if err := s.producer.Produce("product-updated-new", product.StockKey); err != nil {
 			return err
 		}
 	}
@@ -98,7 +98,7 @@ func (s *ProductService) DeleteProduct(ctx context.Context, filter map[string]in
 		return err
 	}
 
-	if err := s.producer.Produce("product-deleted", product); err != nil {
+	if err := s.producer.Produce("product-deleted", product.StockKey); err != nil {
 		return err
 	}
 	return nil

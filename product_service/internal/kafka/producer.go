@@ -5,12 +5,11 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/AyanokojiKiyotaka8/E-Commerce/product_service/internal/model"
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 )
 
 type Producer interface {
-	Produce(string, *model.Product) error
+	Produce(string, string) error
 	Stop()
 }
 
@@ -40,7 +39,7 @@ func NewKafkaProducer() (*KafkaProducer, error) {
 	return &KafkaProducer{producer: p}, nil
 }
 
-func (p *KafkaProducer) Produce(topic string, event *model.Product) error {
+func (p *KafkaProducer) Produce(topic string, event string) error {
 	ev, err := json.Marshal(event)
 	if err != nil {
 		return fmt.Errorf("failed to marshal data: %w", err)

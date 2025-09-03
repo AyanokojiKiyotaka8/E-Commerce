@@ -12,6 +12,7 @@ type InventoryServicer interface {
 	GetInventories(context.Context, map[string]interface{}) ([]*model.Inventory, error)
 	CreateInventory(context.Context, *model.Inventory) (*model.Inventory, error)
 	UpdateInventory(context.Context, map[string]interface{}, map[string]interface{}) error
+	GetConsumeData(string, string) error
 }
 
 type InventoryService struct {
@@ -38,4 +39,8 @@ func (s *InventoryService) CreateInventory(ctx context.Context, inventory *model
 
 func (s *InventoryService) UpdateInventory(ctx context.Context, filter map[string]interface{}, update map[string]interface{}) error {
 	return s.store.UpdateInventory(ctx, filter, update)
+}
+
+func (s *InventoryService) GetConsumeData(topic string, stockKey string) error {
+	return nil
 }
